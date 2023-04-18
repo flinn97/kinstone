@@ -87,6 +87,7 @@ class MainContent extends Component{
   constructor(props) {
     super(props);
     this.accept=this.accept.bind(this);
+    this.decline=this.decline.bind(this);
     this.state={
 
       switchCase:"incoming"
@@ -127,32 +128,51 @@ class MainContent extends Component{
               }
             
 
-              await opps.cleanJsonPrepareRun({ addkinstone: [{ title: word, picURL: kinstone,  owner:state.user.getJson().owner  }, { title: word, picURL: kinstone, owner:req.getJson().sender }] });
+              await opps.cleanJsonPrepare({ addkinstone: { title: word, picURL: kinstone,  owner:state.user.getJson().owner, _id:Math.floor((Math.random() * 100000)).toString(),   } });
+              await opps.jsonPrepare({ addkinstone: { title: word, picURL: kinstone, owner:req.getJson().sender, _id:Math.floor((Math.random() * 100000)).toString(), }});
 
     await opps.prepareRun({ del: [userHalf, senderHalf,  userOgHalf, senderOgHalf, req] });
 
-    let requests = componentList.getList("mergeRequest", state.user.getJson().owner );
-    await senderOgHalf.setCompState({type:"kinstoneComponent"})
-    await opps.cleanPrepareRun({ update: senderOgHalf });
+    // let requests = componentList.getList("mergeRequest", state.user.getJson().owner );
+    // await senderOgHalf.setCompState({type:"kinstoneComponent"})
+    // await opps.cleanPrepareRun({ update: senderOgHalf });
 
-    debugger
-    for(let req1 of requests){
+    // debugger
+    // for(let req1 of requests){
       
-      if(req1.getJson().friendOgKinstoneID===OGID){
-        let del1 = componentList.getComponent("mergeRequestKinstoneHalf", req1.getJson().kinstoneHalfid);
-        let del2 = componentList.getComponent("mergeRequestKinstoneHalf", req1.getJson().senderKinstoneHalfid);
-        let change1 = await auth.getRequestedKinstone(del2.getJson().ogKinstoneHalf);
-        await opps.prepareRun({del: [del1, del2, req1]});
-        if(change1){
-          change1.setCompState({type:"kinstoneComponent"});
-          opps.cleanPrepareRun({update:change1});
+    //   if(req1.getJson().friendOgKinstoneID===OGID){
+    //     let del1 = componentList.getComponent("mergeRequestKinstoneHalf", req1.getJson().kinstoneHalfid);
+    //     let del2 = componentList.getComponent("mergeRequestKinstoneHalf", req1.getJson().senderKinstoneHalfid);
+    //     let change1 = await auth.getRequestedKinstone(del2.getJson().ogKinstoneHalf);
+    //     await opps.prepareRun({del: [del1, del2, req1]});
+    //     if(change1){
+    //       change1.setCompState({type:"kinstoneComponent"});
+    //       opps.cleanPrepareRun({update:change1});
 
-        }
+    //     }
 
 
-      }
-    }
+    //   }
+    // }
     
+
+  }
+
+  async decline(req){
+    debugger
+    let app = this.props.app;
+    let dispatch = app.dispatch;
+    let state = app.state;
+    let opps = state.opps;
+    let componentList = state.componentList;
+    let userHalf = await componentList.getComponent("mergeRequestKinstoneHalf", req.getJson().kinstoneHalfid);
+    let senderHalf =  await componentList.getComponent("mergeRequestKinstoneHalf", req.getJson().senderKinstoneHalfid);
+    let senderOgHalf = await auth.getRequestedKinstone(senderHalf.getJson().ogKinstoneHalf, componentList);
+    let userOgHalf = componentList.getComponent("kinstoneComponent", userHalf.getJson().ogKinstoneHalf);
+    let OGID = userOgHalf.getJson()._id
+    senderOgHalf.setCompState({type:"kinstoneComponent"});
+    await opps.cleanPrepare({ update: senderOgHalf});
+    await opps.prepareRun({del:[userHalf, senderHalf, req]});
 
   }
 
@@ -176,9 +196,9 @@ class MainContent extends Component{
         //accept
         (comp)=>{
           this.accept(comp);
-        }, 
+        }, (comp)=>{this.decline(comp)}
         //decline
-        ()=>{}]}}  />
+       ]}}  />
             </>):(<>
               <MapComponent app={app} name="mergeRequest"  filter={{search:state.user.getJson().owner, attribute:"sender"}} cells={["sender",{custom: CustomMergeReqListItem, props:{app:app}},  {txt: "pending..."}, {txt: "cancel"}, ]}  />
       </>)}

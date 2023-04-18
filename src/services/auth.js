@@ -154,6 +154,9 @@ class Auth {
         }
         await componentList.addComponents(rawData, false);
         let kinstone = await componentList.getComponent("mergeRequestKinstoneHalf", id);
+        if(kinstone===undefined){
+            kinstone = await componentList.getComponent("kinstoneComponent", id);
+        }
         return kinstone
        
     }

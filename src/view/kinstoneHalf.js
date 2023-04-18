@@ -132,14 +132,7 @@ class MainContent extends Component {
                 }
                 
               }
-              // let word = "";
-              // for (let el of componentList.getList("chosenKinstoneComponent")) {
-              //   word += el.getJson().title + " "
-              // }
-              // componentList.clearSelectedList("chosenKinstoneComponent", "type");
 
-              // await opps.cleanJsonPrepareRun({ addkinstone: { title: word, picURL: kinstone } })
-              // opps.prepareRun({ del: componentList.getList("chozenKinstoneComponent") })
               await opps.cleanJsonPrepareRun({ addmergeRequest: {_id: Math.random(Math.floor() * 100000).toString(), owner: friendKinstone.getJson().ogOwner, friendOgKinstoneID: friendKinstone.getJson().ogKinstoneHalf, sender: state.user.getJson()._id, kinstoneHalfid: friendKinstone.getJson()._id, senderKinstoneHalfid:userKinstone.getJson()._id }})
               userKinstone.setCompState({type:"mergeRequestKinstoneHalf"});
               friendKinstone.setCompState({type:"mergeRequestKinstoneHalf"});
